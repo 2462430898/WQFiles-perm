@@ -6,19 +6,32 @@ jobs:
     runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
+
+      - name: Inspect workspace
+        run: |
+          pwd
+          ls -la
+          file WQFiles-src.zip || true
+
       - name: Unzip source
-        run: unzip -q WQFiles-src.zip
+        run: |
+          unzip -o WQFiles-src.zip
+          ls -la
+          ls -la WQFiles-src | head -20
+
       - name: Show toolchain
         run: |
           sw_vers
           xcodebuild -version
           xcrun --sdk iphoneos --show-sdk-version
+
       - name: Build
         working-directory: WQFiles-src
         run: |
           chmod +x build.sh
           WQ_SKIP_PREFLIGHT=1 ./build.sh
           ls -lh WQFiles.ipa
+
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
