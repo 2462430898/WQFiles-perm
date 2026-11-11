@@ -1,0 +1,31 @@
+name: Build WQFiles IPA
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Unzip source
+        run: unzip -q WQFiles-src.zip
+
+      - name: Show toolchain
+        run: |
+          sw_vers
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+
+      - name: Build
+        working-directory: WQFiles-src
+        run: |
+          chmod +x build.sh
+          WQ_SKIP_PREFLIGHT=1 ./build.sh
+          ls -lh WQFiles.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: WQFiles-unsigned-ipa
+          path: WQFiles-src/WQFiles.ipa
